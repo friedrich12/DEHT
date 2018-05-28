@@ -9,6 +9,6 @@
 #include <string.h>
 
 
-void read_from_socket(int socket, unsigned int x, char* buffer);
+std::string read_from_socket(int socket);
 
 void send_to_socket(int socket, std::string msg);

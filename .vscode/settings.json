@@ -43,6 +43,24 @@
         "__nullptr": "cpp",
         "cstddef": "cpp",
         "iterator": "cpp",
-        "string": "cpp"
+        "string": "cpp",
+        "locale": "cpp",
+        "unordered_set": "cpp",
+        "iomanip": "cpp",
+        "cstring": "cpp",
+        "deque": "cpp",
+        "forward_list": "cpp",
+        "numeric": "cpp",
+        "valarray": "cpp",
+        "__bit_reference": "cpp",
+        "__hash_table": "cpp",
+        "__split_buffer": "cpp",
+        "__tree": "cpp",
+        "hash_map": "cpp",
+        "hash_set": "cpp",
+        "list": "cpp",
+        "map": "cpp",
+        "set": "cpp",
+        "algorithm": "cpp"
     }
 }
