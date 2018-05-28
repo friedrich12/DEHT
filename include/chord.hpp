@@ -3,12 +3,12 @@
 #include <iostream>
 #include <fstream>
 #include <mutex>
-#include <address.h>
+#include <address.hpp>
 #include <thread>
 #include <vector>
 //#include <functional>
 #include <string>
-#include <assert.h>    
+#include <assert.hpp>    
 
 class Local{
     public:

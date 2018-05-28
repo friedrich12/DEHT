@@ -6,7 +6,7 @@
 #include <string>
 #include <unordered_set>
 #include <utility>
-#include <vars.h>
+#include <vars.hpp>
 
 bool inrange(std::size_t c, std::size_t a, std::size_t b);
 

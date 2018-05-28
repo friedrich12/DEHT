@@ -1,4 +1,4 @@
-#include <chord.h>
+#include <chord.hpp>
 
 Local::Local(Address local_address, Address remote_address = NULL){
     this->addr = local_address;

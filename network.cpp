@@ -1,4 +1,4 @@
-#include <network.h>
+#include <network.hpp>
 
 std::string read_from_socket(int socket){
    /* int bytesRead = 0;

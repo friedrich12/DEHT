@@ -1,8 +1,8 @@
 #pragma once
 
-#include <address.h>
-#include <vars.h>
-#include <network.h>
+#include <address.hpp>
+#include <vars.hpp>
+#include <network.hpp>
 #include <vector>
 
 #include <nlohmann/json.hpp>
