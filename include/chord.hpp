@@ -3,19 +3,26 @@
 #include <iostream>
 #include <fstream>
 #include <mutex>
-#include <address.hpp>
 #include <thread>
 #include <vector>
 //#include <functional>
 #include <string>
-#include <assert.hpp>    
+#include <assert.h>
+//Core
+#include <address.hpp>
+#include <fstream>
+#include <thread>
+#include <map>
+#include <remote.hpp>
+#include <vars.hpp>
+#include <network.hpp>    
 
 class Local{
     public:
         Local(Address local_address, Address remote_address = NULL);
         bool is_ours(std::size_t id);
         void shutdown();
-        std::string log();
+        std::string log(std::string info);
         void start();
         bool ping();
         void join();
@@ -32,9 +39,12 @@ class Local{
         void closest_preceding_finger(int id);
         void run();
     private:
-        Address addr;
+        Address address;
+        Remote predecessor;
         bool shutdown;
-        std::vector<int> successors;
-        std::vector<int> daemons;
-        std::vector<int> commands;
+        int socket;
+        std::vector<Data> successors;
+        std::map<std::string,std::thread> daemons;
+        std::vector<std::string> commands;
+        std::vector<Remote> finger;
 };
