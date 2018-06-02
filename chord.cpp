@@ -7,7 +7,7 @@ Local::Local(Address local_address, Address remote_address = NULL){
     //this->join(remote_address);
 }
 
-size_t Local::id(int offset = 0){
+inline size_t Local::id(int offset = 0){
     return (this->addr.Hash() + offset) % SIZE;
 }
 
@@ -47,16 +47,61 @@ void Local::start(){
     for(auto const& thread : this->daemons){
         thread.join();
     }
+
+    this->log("Started Protocol");
 }
 
 bool Local::ping(){
     return true;
 }
 
-void Local::join(Address remote_address){
-    //this->predecessor
-    if(remote_address.data.ip == ""){
-        
+Remote Local::successor(){
+    for(auto const& remote : this->finger){
+        if(remote.ping()){
+            this->finger[0] = remote;
+            return remote;
+        }
     }
+    // Lets try this one
+    for(auto const& remote : this->successors){
+        if(remote.ping()){
+            this->finger[0] = remote;
+            return remote;
+        }
+    }
+    std::cerr << "No successor found, terminating";
+    this->shutdown = true;
+    exit(1);
 }
 
+void Local::join(Address remote_address){
+    //this->predecessor
+    // My way of telling if its empty
+    if(remote_address.data.ip != ""){
+        Remote remote = Remote(remote_address);
+        this->finger[0] = remote.find_successor(this->id()); 
+    }else{
+        this->finger[0] = Remote(this->address);
+    }
+
+    this->log("Node Joined");
+}
+
+bool Local::stabilize(){
+    this->log("stabilize");
+
+    Remote suc = this->successor();
+    if(suc.id() != this->finger[0].id()){
+        this->finger[0] = suc;
+    }
+    Remote r = suc.predecessor();
+    if ((r.address.data.ip != "") &&
+        (inrange(r.id(), this->id(1), suc.id())) && (this->id(1) != suc.id()) && (r.ping())) {
+            this->finger[0] = r;
+    }
+
+    // Notify the new sucsessor
+    this->successor().notify(this);
+
+    return true;
+}

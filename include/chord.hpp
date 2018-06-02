@@ -31,8 +31,8 @@ class Local{
         bool fix_fingers();
         bool update_successors();
         void get_successors();
-        std::size_t id(int offset = 0);
-        void successor();
+        inline std::size_t id(int offset = 0);
+        Remote successor();
         void predecessor();
         void find_successor(int id);
         void find_predessor(int id);
@@ -43,7 +43,7 @@ class Local{
         Remote predecessor;
         bool shutdown;
         int socket;
-        std::vector<Data> successors;
+        std::vector<Remote> successors;
         std::map<std::string,std::thread> daemons;
         std::vector<std::string> commands;
         std::vector<Remote> finger;
