@@ -28,6 +28,7 @@ class Remote{
         void send(std::string msg);
         std::string recv();
         bool ping();
+        Address address;
 
         // Depends on sucsessful connection
         std::string command(std::string msg);
@@ -39,7 +40,7 @@ class Remote{
         void notify(Remote node);
     private:
         bool connected;
-        Address address;
+        
         std::string lastMessageSent;
 
         //struct sockaddr_in address;

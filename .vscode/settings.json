@@ -61,6 +61,8 @@
         "list": "cpp",
         "map": "cpp",
         "set": "cpp",
-        "algorithm": "cpp"
+        "algorithm": "cpp",
+        "__locale": "cpp",
+        "queue": "cpp"
     }
 }
