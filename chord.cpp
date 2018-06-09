@@ -4,7 +4,7 @@ Local::Local(Address local_address, Address remote_address = NULL){
     this->address = local_address;
     std::cout << "Self id " << this->id();
     this->shutdown = false;
-    //this->join(remote_address);
+    this->join(remote_address);
 }
 
 inline size_t Local::id(int offset = 0){
@@ -200,5 +200,34 @@ Remote Local::find_successor(std::size_t id){
     if(this->predecessor() && 
         inrange(id,this->predecessor().id(1), this->id(1))){
         return Remote(this->address);
+    }
+}
+
+void Local::run(){
+    this->socket = socket(AF_INET, SOCK_STREAM, 0);
+    if(this->socket == 0){
+        std::cerr << "Failed to create socket" << endl;
+    }
+
+    struct sockaddr_in serv_addr;
+    int len = sizeof(serv_addr);
+
+    bzero(&serv_addr, sizeof(serv_addr));
+    serv_addr.sin_family = AF_INET;
+    serv_addr.sin_port = htons(this->address.data.port);
+
+    if(bind(this->socket, (struct sockaddr *) &serv_addr, sizeof(address)) < 0){
+        std::cerr << "Failed to bind" << endl;
+    }
+
+    listen(this->socket, 3);
+
+    for(;;){
+        int new_socket = accept(this->socket, (struct sockaddr*) &serv_addr,(socklen_t*) &len);
+        if(new_socket < 0){
+            std::cerr << "Failed to accept socket" << endl;
+        }
+
+        std::string request = read_from_socket(new_socket);       
     }
 }
