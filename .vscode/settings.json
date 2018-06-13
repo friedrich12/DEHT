@@ -63,6 +63,7 @@
         "set": "cpp",
         "algorithm": "cpp",
         "__locale": "cpp",
-        "queue": "cpp"
+        "queue": "cpp",
+        "__functional_base": "cpp"
     }
 }

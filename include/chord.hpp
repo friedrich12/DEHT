@@ -7,6 +7,7 @@
 #include <vector>
 //#include <functional>
 #include <string>
+#include <sstream>
 #include <assert.h>
 //Core
 #include <address.hpp>
@@ -21,8 +22,8 @@
 
 class Local{
     public:
-        Local(Address local_address, Address remote_address = NULL);
-        bool is_ours(std::size_t id);
+        Local(Address local_address, Address remote_address = NULL) noexcept;
+        bool is_ours(std::size_t id) noexcept;
         void shutdown();
         std::string log(std::string info);
         void start();
@@ -33,7 +34,7 @@ class Local{
         bool fix_fingers();
         bool update_successors();
         vector<Remote> get_successors();
-        inline std::size_t id(int offset = 0);
+        inline std::size_t id(int offset = 0) noexcept;
         Remote successor();
         Remote predecessor();
         Remote find_successor(std::size_t id);

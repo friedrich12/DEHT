@@ -88,7 +88,7 @@ std::string Remote::command(std::string msg){
         std::string response = this->recv();
         return response;
     }
-    return NULL;
+    return "";
 }
 
 std::vector<Remote> Remote::get_successors(){
@@ -101,7 +101,7 @@ std::vector<Remote> Remote::get_successors(){
             return myvec;
         }
     
-        json j = response;
+        auto j = json::parse(response);
         
         for(json::iterator it = j.begin(); it != j.end(); ++it){
             json tmp = *it;
@@ -120,7 +120,7 @@ Remote Remote::successor(){
     if(this->connected){
         this->send("get_successor");
 
-        json j = this->recv();
+        auto j = json::parse(this->recv());
         Data d = j;
         return Remote(Address(d.ip,d.port));
     }
@@ -136,7 +136,7 @@ Remote Remote::predecessor(){
         if(reponse == ""){
             return d;
         }
-        json j = reponse;
+        auto j = json::parse(reponse);
         Data d = j;
         return Remote(Address(d.ip,d.port));
     }
@@ -147,7 +147,7 @@ Remote Remote::find_successor(std::size_t id){
     Address d("", NULL);
     if(this->connected){
         this->send("find_successor " + id);
-        json j = this->recv();
+        auto j = json::parse(this->recv());
         Data d = j;
         return Remote(Address(d.ip,d.port));
     }
@@ -160,7 +160,7 @@ Remote Remote::closest_preceding_finger(std::size_t id){
         this->send("closest_preceding_finger " + id);
 
         std::string response = this->recv();
-        json j = response;
+        auto j = json::parse(response);
         Data d = j;
         return Remote(Address(d.ip,d.port));
     }
