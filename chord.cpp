@@ -124,7 +124,9 @@ bool Local::fix_fingers(){
         *select_randomly(this->finger.begin(),this->finger.end());
     
     auto x = std::distance(foo.begin(), i);
-    this->finger[x] = this->find_successor(this-id(1 << x));
+    // AKA 1 * 2^x just a performance upgrade
+    int offset = 1 << x;
+    this->finger[x] = this->find_successor(this->id(offset));
 
     return true;
 }
@@ -139,7 +141,7 @@ bool Local::update_successors(){
         sucs.push_back(suc);
         suc_list = suc.get_successors();
         if(!suc_list.empty()){
-            sucs.push_back(suc_list);
+            sucs.insert(std::end(suc_list),std::begin(suc_list), std::end(suc_list));
         }
         this->successors = sucs;
     }
@@ -166,7 +168,7 @@ inline std::size_t Local::id(int offset = 0){
 Remote Local::closest_preceding_finger(std::size_t id){
     this->log("closest_preceding_finger");
     vector<Remote> data = this->finger;
-    data.insert(data.end(), this->successors.begin(), this->successors.end());
+    data.insert(std::end(data), std::begin(this->successors), std::end(this->successors));
     
     for(auto const& node : data){
         if((node.address.data.ip != "") && inrange(node.id(), this->id(1), id) 
@@ -220,6 +222,7 @@ void Local::run(){
         std::cerr << "Failed to bind" << endl;
     }
 
+    // Allow 3 pending connections
     listen(this->socket, 3);
 
     for(;;){
@@ -234,7 +237,7 @@ void Local::run(){
         std::vector<std::string> vec;
         std::stringstream parse(request);
         std::string p;
-        while(std::getline(parse, p, ' ')){
+        while(std::getline(parse, p, " ")){
             vec.push_back(p);
         }
         
@@ -288,7 +291,8 @@ void Local::run(){
         }
 
         send(new_socket, result , strlen(hello) , 0);
-
+        
+        // Close the socket
         close(new_socket);
     }
 }
