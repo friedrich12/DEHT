@@ -25,7 +25,7 @@ class DEHT{
         std::string _set(std::string key, std::string value);
 
         bool distribute_data();
-        void create_dht(std::string port);
+        //void create_dht(std::string addr, std::string port);
 
         map<std::string, std::string> data;
         vector<std::string> removeKeys;

@@ -63,12 +63,11 @@ bool DEHT::distribute_data(){
     for(auto const& key : this->removeKeys){
         if(this->local.predecessor().data.ip && !inrange(std::hash<std::string>{}(key),
             this->local.predecessor().id(1), this->local.id(1))){
-           
            try
            {
-               // Edit this later
+               // Edit the parsing later
                Remote node = this->local.find_successor(hash<std::string>{}(key));
-               node.command("set " + );
+               node.command("set " + "key " + key + "value " + this->data[key]);
                this->removeKeys.push_back(key);
            }
            catch(const std::exception& e)
@@ -87,7 +86,10 @@ bool DEHT::distribute_data(){
     return true;
 }
 
-void DEHT::create_dht(std::string port){
-    Address laddress("127.0.0.1", port);
+/*void DEHT::create_dht(std::string addr, std::string port){
+    Address laddress(addr, port);
+    std::vector<DEHT> r;
+
     //....
-}
+}*/
+
