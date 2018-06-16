@@ -22,9 +22,9 @@
 
 class Local{
     public:
-        Local(Address local_address, Address remote_address = NULL) noexcept;
+        Local(Address local_address, Address remote_address) noexcept;
         bool is_ours(std::size_t id) noexcept;
-        void shutdown();
+        void shutdownConnection();
         std::string log(std::string info);
         void start();
         bool ping();
@@ -33,10 +33,10 @@ class Local{
         void notify();
         bool fix_fingers();
         bool update_successors();
-        vector<Remote> get_successors();
+        std::vector<Remote> get_successors();
         inline std::size_t id(int offset = 0) noexcept;
         Remote successor();
-        Remote predecessor();
+        Remote getPredecessor();
         Remote find_successor(std::size_t id);
         Remote find_predessor(std::size_t id);
         Remote closest_preceding_finger(std::size_t id);

@@ -3,7 +3,6 @@
 // Core Things
 #include <address.hpp>
 #include <chord.hpp>
-#include <daemon.hpp>
 #include <network.hpp>
 #include <remote.hpp>
 #include <vars.hpp>
@@ -16,7 +15,7 @@
 class DEHT{
     public:
         DEHT(Address local_address, Address remote_address);
-        void shutdown();
+        void shutdownConnection();
 
         std::string get(std::string key);
         void set(std::string key, std::string value);
@@ -27,9 +26,9 @@ class DEHT{
         bool distribute_data();
         //void create_dht(std::string addr, std::string port);
 
-        map<std::string, std::string> data;
-        vector<std::string> removeKeys;
+        std::map<std::string, std::string> data;
+        std::vector<std::string> removeKeys;
         bool shutdown;
-        map<std::string, std::thread> daemons;
+        std::map<std::string, std::thread> daemons;
         Local local;
 };

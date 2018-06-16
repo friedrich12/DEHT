@@ -1,6 +1,6 @@
 #include <chord.hpp>
 
-Local::Local(Address local_address, Address remote_address = NULL) noexcept{
+Local::Local(Address local_address, Address remote_address) noexcept{
     this->address = local_address;
     std::cout << "Self id " << this->id();
     this->shutdown = false;
@@ -16,7 +16,7 @@ bool Local::is_ours(std::size_t id) noexcept{
     return inrange(id, this->predecessor.id(1), this->id(1));
 }
 
-void Local::shutdown(){
+void Local::shutdownConnection(){
     this->shutdown = true;
     close(this->socket);
 }
@@ -94,7 +94,7 @@ bool Local::stabilize(){
     if(suc.id() != this->finger[0].id()){
         this->finger[0] = suc;
     }
-    Remote r = suc.predecessor();
+    Remote r = suc.getPredecessor();
     if ((r.address.data.ip != "") &&
         (inrange(r.id(), this->id(1), suc.id())) && (this->id(1) != suc.id()) && (r.ping())) {
             this->finger[0] = r;
@@ -112,7 +112,7 @@ void Local::notify(Remote r){
     // the new node r is in the range of (pred(n), n)
     // out previous predecessor is dead
     if((this->predecessor.RemoteAddrStr() == "") ||
-        (inrange(r.id(),this->predecessor().id(1), this->id())) || (!this->predecessor().ping())){
+        (inrange(r.id(),this->getPredecessor().id(1), this->id())) || (!this->getPredecessor().ping())){
         this->predecessor = r;
     }
 }
@@ -179,7 +179,7 @@ Remote Local::closest_preceding_finger(std::size_t id){
     return Remote(this->address);
 }
 
-Remote Local::predecessor(){
+Remote Local::getPredecessor(){
     return this->predecessor;
 }
 
@@ -199,8 +199,8 @@ Remote Local::find_predessor(std::size_t id){
 
 Remote Local::find_successor(std::size_t id){
     this->log("find_successor")
-    if(this->predecessor() && 
-        inrange(id,this->predecessor().id(1), this->id(1))){
+    if(this->getPredecessor() && 
+        inrange(id,this->getPredecessor().id(1), this->id(1))){
         return Remote(this->address);
     }
 }

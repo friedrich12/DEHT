@@ -15,8 +15,8 @@ Address::Address(std::string ip, int port){
 } 
 
 size_t Address::Hash(){
-    auto port = std::to_string(this->d.port);
-    std::size_t h1 = std::hash<std::string>{}(this->d.ip);
+    auto port = std::to_string(this->data.port);
+    std::size_t h1 = std::hash<std::string>{}(this->data.ip);
     std::size_t h2 = std::hash<std::string>{}(port);
     auto hash = h1 ^ (h2 << h1);
     return hash % SIZE;
@@ -27,5 +27,5 @@ Data Address::getData(){
 }
 
 std::string Address::ToString(){
-    return std::to_string(this->d.ip) + ":" + std::to_string(this->d.port);
+    return std::to_string(this->data.ip) + ":" + std::to_string(this->data.port);
 }

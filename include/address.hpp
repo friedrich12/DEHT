@@ -21,12 +21,13 @@ class Address{
     public:
         Data data;
         Address(std::string ip, int port);
+        Address();
         std::size_t Hash();
-        bool operator == (const Address &a, const Address &b){
-            return (a.Hash() == b.Hash());
+        bool operator == (Address a){
+            return (this->Hash() == a.Hash());
         }
-        bool operator < (const Address &a, const Address &b){
-            return (a.Hash() < b.Hash());
+        bool operator < (Address a){
+            return (this->Hash() < a.Hash());
         }
         Data getData();
         std::string ToString();

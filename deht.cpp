@@ -11,8 +11,8 @@ DEHT::DEHT(Address local_address, Address remote_address){
     this->local.start();
 };
 
-void DEHT::shutdown(){
-    this->lcoal.shutdown();
+void DEHT::shutdownConnection(){
+    this->lcoal.shutdownConnection();
     this->shutdown = true;
 }
 

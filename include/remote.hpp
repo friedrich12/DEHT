@@ -20,7 +20,7 @@ bool Func1(int Arg1, Lambda Arg2){ // or Lambda&&, which is usually better
 
 class Remote{
     public:
-        Remote::Remote(Address remoteAddress);
+        Remote(Address remoteAddress) noexcept;
         void open_connection();
         void close_connection();
         std::string RemoteAddrStr();
