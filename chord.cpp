@@ -1,14 +1,14 @@
 #include <chord.hpp>
 
-Local::Local(Address local_address, Address remote_address) noexcept{
+Local::Local(Address local_address, Address remote_address){
     this->address = local_address;
     std::cout << "Self id " << this->id();
     this->shutdown = false;
     this->join(remote_address);
 }
 
-inline size_t Local::id(int offset = 0) noexcept{
-    return (this->addr.Hash() + offset) % SIZE;
+inline size_t Local::id(int offset) noexcept{
+    return (this->address.Hash() + offset) % SIZE;
 }
 
 bool Local::is_ours(std::size_t id) noexcept{
@@ -34,18 +34,18 @@ void Local::log(std::string info){
 
 void Local::start(){
     // Start threads
-    std::thread h(this->run);
-    std::thread h1(this->fix_fingers);
-    std::thread h2(this->stabilize);
-    std::thread h3(this->update_successors);
+    std::thread h(&Local::run, this);
+    std::thread h1(&Local::fix_fingers, this);
+    std::thread h2(&Local::stabilize, this);
+    std::thread h3(&Local::update_successors, this);
 
-    this->daemons["run"] = h;
-    this->daemons["fix_fingers"] = h1;
-    this->daemons["stabilize"] = h2;
-    this->daemons["update_successors"] = h3;
+    this->daemons["run"] = std::ref(h);
+    this->daemons["fix_fingers"] = std::ref(h1);
+    this->daemons["stabilize"] = std::ref(h2);
+    this->daemons["update_successors"] = std::ref(h3);
 
-    for(auto const& thread : this->daemons){
-        thread.join();
+    for(auto thread : this->daemons){
+        thread.second.get().join();
     }
 
     this->log("Started Protocol");
@@ -56,19 +56,27 @@ bool Local::ping(){
 }
 
 Remote Local::successor(){
-    for(auto const& remote : this->finger){
-        if(remote.ping()){
-            this->finger[0] = remote;
-            return remote;
+
+    std::for_each(this->finger.begin(), this->finger.end(),
+        [&](Remote rnode)
+        {
+            if(rnode.ping()){
+                this->finger[0] = rnode;
+                return rnode;
+            }
         }
-    }
+    );
     // Lets try this one
-    for(auto const& remote : this->successors){
-        if(remote.ping()){
-            this->finger[0] = remote;
-            return remote;
+    std::for_each(this->successors.begin(), this->successors.end(),
+        [&](Remote rnode)
+        {
+            if(rnode.ping()){
+                this->finger[0] = rnode;
+                return rnode;
+            }
         }
-    }
+    );
+
     std::cerr << "No successor found, terminating";
     this->shutdown = true;
     exit(1);
@@ -78,10 +86,11 @@ void Local::join(Address remote_address){
     //this->predecessor
     // My way of telling if its empty
     if(remote_address.data.ip != ""){
-        Remote remote = Remote(remote_address);
+        Remote remote(remote_address);
         this->finger[0] = remote.find_successor(this->id()); 
     }else{
-        this->finger[0] = Remote(this->address);
+        Remote self(this->address);
+        this->finger[0] = self;
     }
 
     this->log("Node Joined");
@@ -94,14 +103,16 @@ bool Local::stabilize(){
     if(suc.id() != this->finger[0].id()){
         this->finger[0] = suc;
     }
-    Remote r = suc.getPredecessor();
+    Remote r = suc.predecessor();
     if ((r.address.data.ip != "") &&
         (inrange(r.id(), this->id(1), suc.id())) && (this->id(1) != suc.id()) && (r.ping())) {
             this->finger[0] = r;
     }
 
     // Notify the new sucsessor
-    this->successor().notify(this);
+    Address tmp = this->address;
+    Remote notify(tmp);
+    this->successor().notify(notify);
 
     return true;
 }
@@ -120,10 +131,10 @@ void Local::notify(Remote r){
 bool Local::fix_fingers(){
     // Randomly selected entries and update its value
     this->log("fix_fingers");
-    vector<Remote>::iterator i = 
-        *select_randomly(this->finger.begin(),this->finger.end());
+    std::vector<Remote>::iterator i = 
+        select_randomly(this->finger.begin(),this->finger.end());
     
-    auto x = std::distance(foo.begin(), i);
+    auto x = std::distance(this->finger.begin(), i);
     // AKA 1 * 2^x just a performance upgrade
     int offset = 1 << x;
     this->finger[x] = this->find_successor(this->id(offset));
@@ -134,8 +145,8 @@ bool Local::fix_fingers(){
 bool Local::update_successors(){
     this->log("update successor");
     Remote suc = this->successor();
-    vector<Remote> sucs;
-    vector<Remote> suc_list;
+    std::vector<Remote> sucs;
+    std::vector<Remote> suc_list;
     // Do this if we are not alone
     if(suc.id() != this->id()){
         sucs.push_back(suc);
@@ -151,7 +162,7 @@ bool Local::update_successors(){
 json Local::get_successors(){
     this->log("get_successors");
     json enc;
-    vector<Remote> remote_nodes = this->successors;
+    std::vector<Remote> remote_nodes = this->successors;
     for(auto const& node : remote_nodes){
         Address a = std::move(node.address);
         Data d = std::move(a.data);
@@ -161,22 +172,22 @@ json Local::get_successors(){
     return enc;
 }
 
-inline std::size_t Local::id(int offset = 0){
-    return(this->address.Hash() + offset) % SIZE;
-}
-
 Remote Local::closest_preceding_finger(std::size_t id){
     this->log("closest_preceding_finger");
-    vector<Remote> data = this->finger;
+    std::vector<Remote> data = this->finger;
     data.insert(std::end(data), std::begin(this->successors), std::end(this->successors));
     
-    for(auto const& node : data){
-        if((node.address.data.ip != "") && inrange(node.id(), this->id(1), id) 
-            && (node.ping())){
-            return node;
+      std::for_each(data.begin(), data.end(),
+        [&](Remote node)
+        {
+            if((node.address.data.ip != "") && inrange(node.id(), this->id(1), id) 
+                && (node.ping())){
+                return node;
+            }
         }
-    }
-    return Remote(this->address);
+    );
+    Remote self(this->address);
+    return self;
 }
 
 Remote Local::getPredecessor(){
@@ -198,17 +209,20 @@ Remote Local::find_predessor(std::size_t id){
 }
 
 Remote Local::find_successor(std::size_t id){
-    this->log("find_successor")
-    if(this->getPredecessor() && 
+    this->log("find_successor");
+    if((this->getPredecessor().address.data.ip != "") && 
         inrange(id,this->getPredecessor().id(1), this->id(1))){
-        return Remote(this->address);
+        Remote r(this->address);
+        return r;
     }
+    Remote node = this->predecessor(id);
+    return node.successor();
 }
 
 void Local::run(){
     this->socket = socket(AF_INET, SOCK_STREAM, 0);
     if(this->socket == 0){
-        std::cerr << "Failed to create socket" << endl;
+        std::cerr << "Failed to create socket" << std::endl;
     }
 
     struct sockaddr_in serv_addr;

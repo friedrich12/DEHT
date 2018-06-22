@@ -1,6 +1,6 @@
 #include <remote.hpp>
 
-Remote::Remote(Address remoteAddress) noexcept{
+Remote::Remote(Address remoteAddress){
     this->address = remoteAddress;
 }
 

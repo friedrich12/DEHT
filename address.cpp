@@ -27,5 +27,5 @@ Data Address::getData(){
 }
 
 std::string Address::ToString(){
-    return std::to_string(this->data.ip) + ":" + std::to_string(this->data.port);
+    return (this->data.ip) + ":" + std::to_string(this->data.port);
 }

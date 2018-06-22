@@ -22,18 +22,18 @@
 
 class Local{
     public:
-        Local(Address local_address, Address remote_address) noexcept;
+        Local(Address local_address, Address remote_address);
         bool is_ours(std::size_t id) noexcept;
         void shutdownConnection();
-        std::string log(std::string info);
+        void log(std::string info);
         void start();
         bool ping();
-        void join();
+        void join(Address address);
         bool stabilize();
-        void notify();
+        void notify(Remote r);
         bool fix_fingers();
         bool update_successors();
-        std::vector<Remote> get_successors();
+        json get_successors();
         inline std::size_t id(int offset = 0) noexcept;
         Remote successor();
         Remote getPredecessor();
@@ -47,7 +47,7 @@ class Local{
         bool shutdown;
         int socket;
         std::vector<Remote> successors;
-        std::map<std::string,std::thread> daemons;
+        std::map<std::string,std::reference_wrapper<std::thread>> daemons;
         std::vector<std::string> commands;
         std::vector<Remote> finger;
 };
