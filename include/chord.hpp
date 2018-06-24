@@ -18,7 +18,8 @@
 #include <map>
 #include <remote.hpp>
 #include <vars.hpp>
-#include <network.hpp>    
+// Networking
+#include <network.hpp>
 
 class Local{
     public:
@@ -42,8 +43,8 @@ class Local{
         Remote closest_preceding_finger(std::size_t id);
         void run();
     private:
-        Address address;
         Remote predecessor;
+        Address address;
         bool shutdown;
         int socket;
         std::vector<Remote> successors;

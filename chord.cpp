@@ -210,17 +210,22 @@ Remote Local::find_predessor(std::size_t id){
 
 Remote Local::find_successor(std::size_t id){
     this->log("find_successor");
+    /*
+        We are the successor if both statements hold true
+        1.If we don't have a predecessor
+        2.The id is in our range
+    */
     if((this->getPredecessor().address.data.ip != "") && 
         inrange(id,this->getPredecessor().id(1), this->id(1))){
         Remote r(this->address);
         return r;
     }
-    Remote node = this->predecessor(id);
+    Remote node = this->find_predessor(id);
     return node.successor();
 }
 
 void Local::run(){
-    this->socket = socket(AF_INET, SOCK_STREAM, 0);
+    this->socket = ::socket(AF_INET, SOCK_STREAM, 0);
     if(this->socket == 0){
         std::cerr << "Failed to create socket" << std::endl;
     }
@@ -233,7 +238,7 @@ void Local::run(){
     serv_addr.sin_port = htons(this->address.data.port);
 
     if(bind(this->socket, (struct sockaddr *) &serv_addr, sizeof(address)) < 0){
-        std::cerr << "Failed to bind" << endl;
+        std::cerr << "Failed to bind" << std::endl;
     }
 
     // Allow 3 pending connections
@@ -242,7 +247,7 @@ void Local::run(){
     for(;;){
         int new_socket = accept(this->socket, (struct sockaddr*) &serv_addr,(socklen_t*) &len);
         if(new_socket < 0){
-            std::cerr << "Failed to accept socket" << endl;
+            std::cerr << "Failed to accept socket" << std::endl;
         }
 
         std::string request = read_from_socket(new_socket);
@@ -251,7 +256,7 @@ void Local::run(){
         std::vector<std::string> vec;
         std::stringstream parse(request);
         std::string p;
-        while(std::getline(parse, p, " ")){
+        while(std::getline(parse, p, ' ')){
             vec.push_back(p);
         }
         
@@ -264,47 +269,55 @@ void Local::run(){
         mymap["get_successors"] = 5;
 
         std::string result = "";
+        json j;
 
         auto command = mymap[vec[0]];
         std::size_t node = std::stoi(vec[1]);
 
         switch(command){
             // TODO: Finish This
-            case 0:
+            case 0:{
                 Remote successor = this->successor();
-                json j = successor;
+                j = successor;
                 result = j.dump();
+            }
                 break;
-            case 1:
+            case 1:{
                 if(this->predecessor.connected != false){
                     Remote predecessor = this->predecessor;
-                    json j = predecessor;
+                    j = predecessor;
                     result = j.dump();
                 }
+            }
                 break;
-            case 2:
+            case 2:{
                 Remote successor = this->find_successor(node);
-                json j = successor;
+                j = successor;
                 result = j.dump();
+            }
                 break;
-            case 3:
+            case 3:{
                 Remote closest_finger = this->closest_preceding_finger(node);
-                json j = closest_finger;
+                j = closest_finger;
                 result = j.dump();
-            case 4:
+            }
+                break;
+            case 4:{
                 std::string ip = vec[1];
                 std::string port = vec[2];
                 Address a(ip, std::stoi(port));
                 Remote r(a);
                 this->notify(r);
+            }
                 break;
-            case 5:
-                json j = this->get_successors();
+            case 5:{
+                j = this->get_successors();
                 result = j.dump();
+            }
                 break;
         }
 
-        send(new_socket, result , strlen(hello) , 0);
+        send(new_socket, result.c_str() , strlen(result.c_str()) , 0);
         
         // Close the socket
         close(new_socket);

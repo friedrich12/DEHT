@@ -39,9 +39,8 @@ class Remote{
         Remote find_successor(std::size_t id);
         Remote closest_preceding_finger(std::size_t id);
         void notify(Remote node);
-    private:
         bool connected;
-        
+    private:
         std::string lastMessageSent;
 
         //struct sockaddr_in address;

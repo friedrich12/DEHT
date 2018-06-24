@@ -56,6 +56,9 @@ SOFTWARE.
 #include <string> // string
 #include <vector> // vector
 
+// DEHT
+#include <remote.hpp>
+
 /*!
 @brief namespace for Niels Lohmann
 @see https://github.com/nlohmann
@@ -63,6 +66,17 @@ SOFTWARE.
 */
 namespace nlohmann
 {
+
+    // TODO: Finish this
+    void to_json(json& j, const Remote& p) {
+        j = json{{"name", p.name}, {"address", p.address}, {"age", p.age}};
+    }
+
+    void from_json(const json& j, Remote& p) {
+        p.address = j.at("address").get<std::string>();
+        p.connected = j.at("connected").get<bool>();
+        p.age = j.at("age").get<int>();
+    }
 /*!
 @brief default JSONSerializer template argument
 
