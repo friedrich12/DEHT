@@ -9,12 +9,12 @@ bool inrange(std::size_t c, std::size_t a, std::size_t b){
     return (a <= c || c < b);
 }
 
-Address::Address(std::string ip, int port){
+deht::Address::Address(std::string ip, int port){
     this->data.ip = ip;
     this->data.port = port;
 } 
 
-size_t Address::Hash(){
+size_t deht::Address::Hash(){
     auto port = std::to_string(this->data.port);
     std::size_t h1 = std::hash<std::string>{}(this->data.ip);
     std::size_t h2 = std::hash<std::string>{}(port);
@@ -22,10 +22,10 @@ size_t Address::Hash(){
     return hash % SIZE;
 }
 
-Data Address::getData(){
+Data deht::Address::getData(){
     return this->data;
 }
 
-std::string Address::ToString(){
+std::string deht::Address::ToString(){
     return (this->data.ip) + ":" + std::to_string(this->data.port);
 }

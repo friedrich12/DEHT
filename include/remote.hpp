@@ -18,32 +18,45 @@ bool Func1(int Arg1, Lambda Arg2){ // or Lambda&&, which is usually better
   }
 }*/
 
-class Remote{
-    public:
-        Remote(Address remoteAddress);
-        Remote();
-        void open_connection();
-        void close_connection();
-        std::string RemoteAddrStr();
-        std::size_t id(std::size_t offset = 0);
-        void send(std::string msg);
-        std::string recv();
-        bool ping();
-        Address address;
+namespace deht{
+    void to_json(json& j, const Remote& p) {
+        Address a = p.address;
+        j = json{{"ip", a.data.ip}, {"port", a.data.port}, {"connected", p.connected}};
+    }
+    
+    void from_json(const json& j, Remote& p) {
+        p.address.data.ip = j.at("ip").get<std::string>();
+        p.address.data.port = j.at("port").get<int>();
+        p.connected = j.at("connected").get<bool>();
+    }
+    class Remote{
+        public:
+          Remote(Address remoteAddress);
+          Remote();
+          void open_connection();
+          void close_connection();
+          std::string RemoteAddrStr();
+          std::size_t id(std::size_t offset = 0);
+          void send(std::string msg);
+          std::string recv();
+          bool ping();
+          Address address;
 
-        // Depends on sucsessful connection
-        std::string command(std::string msg);
-        std::vector<Remote> get_successors();
-        Remote successor();
-        Remote predecessor();
-        Remote find_successor(std::size_t id);
-        Remote closest_preceding_finger(std::size_t id);
-        void notify(Remote node);
-        bool connected;
-    private:
-        std::string lastMessageSent;
+          // Depends on sucsessful connection
+          std::string command(std::string msg);
+          std::vector<Remote> get_successors();
+          Remote successor();
+          Remote predecessor();
+          Remote find_successor(std::size_t id);
+          Remote closest_preceding_finger(std::size_t id);
+          void notify(Remote node);
+          bool connected;
+        private:
+          std::string lastMessageSent;
 
-        //struct sockaddr_in address;
-        int socket = 0, valread;
-        std::size_t BUFFER_SIZE;
-};
+          //struct sockaddr_in address;
+          int socket = 0, valread;
+          std::size_t BUFFER_SIZE;
+  };
+
+}

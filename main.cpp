@@ -2,6 +2,7 @@
 #include <cstdlib>
 
 using namespace std;
+using namespace deht;
 
 int main(int argc, char *argv[]){
     // Start the hash table

@@ -1,5 +1,7 @@
 #include <deht.hpp>
 
+using namespace deht;
+
 DEHT::DEHT(Address local_address, Address remote_address){
     this->local = Local(local_address, remote_address);
     this->shutdown = false;
@@ -12,7 +14,7 @@ DEHT::DEHT(Address local_address, Address remote_address){
 };
 
 void DEHT::shutdownConnection(){
-    this->lcoal.shutdownConnection();
+    this->local.shutdownConnection();
     this->shutdown = true;
 }
 

@@ -1,10 +1,10 @@
 #include <remote.hpp>
 
-Remote::Remote(Address remoteAddress){
+deht::Remote::Remote(Address remoteAddress){
     this->address = remoteAddress;
 }
 
-void Remote::open_connection(){
+void deht::Remote::open_connection(){
     this->socket = socket(AF_INET, SOCK_STREAM, 0);
     if(this->socket == 0){
         perror("Failed to create socket\n");
@@ -25,31 +25,31 @@ void Remote::open_connection(){
     this->connected = true;
 }
 
-void Remote::close_connection(){
+void deht::Remote::close_connection(){
     close(this->socket);
     this->socket = NULL;
     this->connected = false;
 }
 
-std::string Remote::RemoteAddrStr(){
+std::string deht::Remote::RemoteAddrStr(){
     std::string r = "Remote " + this->address.ToString();
     return r;
 }
 
-std::size_t Remote::id(std::size_t offset = 0){
+std::size_t deht::Remote::id(std::size_t offset = 0){
     return(this->address.Hash() + offset) % SIZE;
 }
 
-void Remote::send(std::string msg){
+void deht::Remote::send(std::string msg){
     send(this->socket, msg, strlen(msg.c_str()), 0);
     this->lastMessageSent = msg;
 }
 
-std::string Remote::recv(){
+std::string deht::Remote::recv(){
     return read_from_socket(this->socket);
 }
 
-bool Remote::ping(){
+bool deht::Remote::ping(){
     try
     {
         int p = socket(AF_INET, SOCK_STREAM, 0);
@@ -82,7 +82,7 @@ bool Remote::ping(){
     }
 }
 
-std::string Remote::command(std::string msg){
+std::string deht::Remote::command(std::string msg){
     if(this->connected){
         this->send(msg);
         std::string response = this->recv();
@@ -91,7 +91,7 @@ std::string Remote::command(std::string msg){
     return "";
 }
 
-std::vector<Remote> Remote::get_successors(){
+std::vector<Remote> deht::Remote::get_successors(){
     std::vector<Remote> myvec;
     if(this->connected){
         this->send("get_successors");
@@ -115,7 +115,7 @@ std::vector<Remote> Remote::get_successors(){
     return myvec;
 }
 
-Remote Remote::successor(){
+Remote deht::Remote::successor(){
     Address d("",NULL);
     if(this->connected){
         this->send("get_successor");
@@ -127,7 +127,7 @@ Remote Remote::successor(){
     return Remote(d);
 }
 
-Remote Remote::predecessor(){
+Remote deht::Remote::predecessor(){
     Address d("",NULL);
     if(this->connected){
         this->send("get_predecessor");
@@ -143,7 +143,7 @@ Remote Remote::predecessor(){
     return Remote(d);
 }
 
-Remote Remote::find_successor(std::size_t id){
+Remote deht::Remote::find_successor(std::size_t id){
     Address d("", NULL);
     if(this->connected){
         this->send("find_successor " + id);
@@ -154,7 +154,7 @@ Remote Remote::find_successor(std::size_t id){
     return Remote(d);
 }
 
-Remote Remote::closest_preceding_finger(std::size_t id){
+Remote deht::Remote::closest_preceding_finger(std::size_t id){
     Address d("", NULL);
     if(this->connected){
         this->send("closest_preceding_finger " + id);
@@ -167,6 +167,6 @@ Remote Remote::closest_preceding_finger(std::size_t id){
     return Remote(d);
 }
 
-void Remote::notify(Remote node){
+void deht::Remote::notify(Remote node){
     this->send("notify " + node.address.data.ip + " " + std::to_string(node.address.data.port));
 }

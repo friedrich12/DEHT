@@ -21,37 +21,40 @@
 // Networking
 #include <network.hpp>
 
-class Local{
-    public:
-        Local(Address local_address, Address remote_address);
-        bool is_ours(std::size_t id) noexcept;
-        void shutdownConnection();
-        void log(std::string info);
-        void start();
-        bool ping();
-        void join(Address address);
-        bool stabilize();
-        void notify(Remote r);
-        bool fix_fingers();
-        bool update_successors();
-        json get_successors();
-        inline std::size_t id(int offset = 0) noexcept;
-        Remote successor();
-        Remote getPredecessor();
-        Remote find_successor(std::size_t id);
-        Remote find_predessor(std::size_t id);
-        Remote closest_preceding_finger(std::size_t id);
-        void run();
-    private:
-        Remote predecessor;
-        Address address;
-        bool shutdown;
-        int socket;
-        std::vector<Remote> successors;
-        std::map<std::string,std::reference_wrapper<std::thread>> daemons;
-        std::vector<std::string> commands;
-        std::vector<Remote> finger;
-};
+namespace deht{
+    
+    class Local{
+        public:
+            Local(Address local_address, Address remote_address);
+            bool is_ours(std::size_t id) noexcept;
+            void shutdownConnection();
+            void log(std::string info);
+            void start();
+            bool ping();
+            void join(Address address);
+            bool stabilize();
+            void notify(Remote r);
+            bool fix_fingers();
+            bool update_successors();
+            json get_successors();
+            inline std::size_t id(int offset = 0) noexcept;
+            Remote successor();
+            Remote getPredecessor();
+            Remote find_successor(std::size_t id);
+            Remote find_predessor(std::size_t id);
+            Remote closest_preceding_finger(std::size_t id);
+            void run();
+        private:
+            Remote predecessor;
+            Address address;
+            bool shutdown;
+            int socket;
+            std::vector<Remote> successors;
+            std::map<std::string,std::reference_wrapper<std::thread>> daemons;
+            std::vector<std::string> commands;
+            std::vector<Remote> finger;
+    };
+}
 
 template<typename Iter, typename RandomGenerator>
 Iter select_randomly(Iter start, Iter end, RandomGenerator& g) {
