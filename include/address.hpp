@@ -7,13 +7,16 @@
 #include <unordered_set>
 #include <utility>
 #include <vars.hpp>
+#include "nlohmann/json.hpp"
+
+using json = nlohmann::json;
 
 bool inrange(std::size_t c, std::size_t a, std::size_t b);
 
 namespace deht{
 
     void to_json(json& j, const Address& p) {
-        j = json{{"ip", p.data.ip}, {"port", p.data.port};
+        j = json{{"ip", p.data.ip}, {"port", p.data.port}};
     }
     
     void from_json(const json& j, Address& p) {

@@ -19,16 +19,7 @@ bool Func1(int Arg1, Lambda Arg2){ // or Lambda&&, which is usually better
 }*/
 
 namespace deht{
-    void to_json(json& j, const Remote& p) {
-        Address a = p.address;
-        j = json{{"ip", a.data.ip}, {"port", a.data.port}, {"connected", p.connected}};
-    }
-    
-    void from_json(const json& j, Remote& p) {
-        p.address.data.ip = j.at("ip").get<std::string>();
-        p.address.data.port = j.at("port").get<int>();
-        p.connected = j.at("connected").get<bool>();
-    }
+
     class Remote{
         public:
           Remote(Address remoteAddress);
@@ -57,6 +48,17 @@ namespace deht{
           //struct sockaddr_in address;
           int socket = 0, valread;
           std::size_t BUFFER_SIZE;
-  };
-
+    };
+    
+    void to_json(json& j, const Remote& p) {
+        Address a = p.address;
+        j = json{{"ip", a.data.ip}, {"port", a.data.port}, {"connected", p.connected}};
+    }
+    
+    void from_json(const json& j, Remote& p) {
+        p.address.data.ip = j.at("ip").get<std::string>();
+        p.address.data.port = j.at("port").get<int>();
+        p.connected = j.at("connected").get<bool>();
+    }
+  
 }

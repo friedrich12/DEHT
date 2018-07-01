@@ -1,5 +1,7 @@
 #include <remote.hpp>
 
+using namespace deht;
+
 deht::Remote::Remote(Address remoteAddress){
     this->address = remoteAddress;
 }
