@@ -24,6 +24,15 @@ namespace deht{
         p.data.port = j.at("port").get<int>();
     }
 
+    void to_json(json& j, const Data& d) {
+        j = json{{"ip", d.ip}, {"port", d.port}};
+    }
+
+    void from_json(const json& j, Data& d){
+        d.ip = j.at("ip").get<std::string>();
+        d.port = j.at("port").get<int>();
+    }
+
     struct Data{
         std::string ip;
         int port;

@@ -169,7 +169,7 @@ json deht::Local::get_successors(){
         // TODO Fix with new to_json serializer
         Address a = std::move(node.address);
         Data d = std::move(a.data);
-        json tmp = std::move(d);
+        json tmp = d;
         enc.push_back(tmp);
     }
     return enc;
